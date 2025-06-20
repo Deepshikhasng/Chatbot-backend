@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # FAQ database
 faq = {
-    "can i upgrade or downgrade my plan": "Yes, our flexible plans allow you to easily upgrade or downgrade your services at any time.",
+    "can i upgrade or downgrade my plan": "Yes, our flexible plans allow you to easily upgrade your services at any time.",
     "what is cloud hosting": "Cloud hosting uses a network of virtual servers hosted on the internet, offering scalable resources and higher uptime compared to traditional hosting.",
     "do you offer technical support": "Yes, our team offers 24/7 technical support through multiple channels.",
     "what are your service hours": "Our services are available 24/7, including holidays.",
