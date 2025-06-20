@@ -72,25 +72,25 @@ def webhook():
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "AWS",
-                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Azure",
-                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Oracle",
-                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Google Cloud",
-                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
                                 }
                             ]
                         ]
