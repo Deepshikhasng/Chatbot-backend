@@ -72,25 +72,25 @@ def webhook():
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "AWS",
-                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index_testng.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Azure",
-                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index_testng.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Oracle",
-                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index_testng.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Google Cloud",
-                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index_testng.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/newer_index_testng.html"
                                 }
                             ]
                         ]
