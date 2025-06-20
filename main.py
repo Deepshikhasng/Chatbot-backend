@@ -72,25 +72,25 @@ def webhook():
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "AWS",
-                                    "link": "http://127.0.0.1:5500/vensysco-website-prototypev.0.0.1-main/newer_index.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index.html#hyperscaler-section"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Azure",
-                                    "link": "http://127.0.0.1:5500/vensysco-website-prototypev.0.0.1-main/newer_index.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index.html#hyperscaler-section"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Oracle",
-                                    "link": "http://127.0.0.1:5500/vensysco-website-prototypev.0.0.1-main/newer_index.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index.html#hyperscaler-section"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Google Cloud",
-                                    "link": "http://127.0.0.1:5500/vensysco-website-prototypev.0.0.1-main/newer_index.html#hyperscaler-section"
+                                    "link": "http://127.0.0.1:5500/vensysco_website_V0.0.2-main/newer_index.html#hyperscaler-section"
                                 }
                             ]
                         ]
