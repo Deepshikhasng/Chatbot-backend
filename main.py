@@ -48,13 +48,13 @@ def webhook():
             ]
         })
 
-    # Handle chip response: Basic Questions
+    # Basic Questions
     if user_query == "basic questions":
         return jsonify({
             "fulfillmentText": "Sure! Feel free to ask anything about our company or general topics. I'm here to help!"
         })
 
-    # Service-related Questions → Show Hyperscaler & Traditional IaaS
+    # Service-related Questions
     if user_query == "service-related questions":
         return jsonify({
             "fulfillmentMessages": [
@@ -77,12 +77,14 @@ def webhook():
             ]
         })
 
-    # Hyperscaler → AWS, Azure, Oracle, Google Cloud
+    # Hyperscaler
     if user_query == "hyperscaler":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {"text": ["Explore our cloud providers:"]}
+                    "text": {
+                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
+                    }
                 },
                 {
                     "payload": {
@@ -123,12 +125,14 @@ def webhook():
             ]
         })
 
-    # Traditional IaaS → Yotta, Sify
+    # Traditional IaaS
     if user_query == "traditional iaas":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {"text": ["Explore our Traditional IaaS providers:"]}
+                    "text": {
+                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
+                    }
                 },
                 {
                     "payload": {
@@ -157,7 +161,7 @@ def webhook():
             ]
         })
 
-    # Fuzzy match user queries with FAQ
+    # Fuzzy matching
     best_match, score = process.extractOne(user_query, faq.keys())
     if score >= 70:
         response = faq[best_match]
