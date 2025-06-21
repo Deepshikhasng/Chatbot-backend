@@ -128,6 +128,38 @@ def webhook():
             ]
         })
 
+    # Handle Traditional IaaS → Show Yotta and Sify buttons
+    if user_query == "traditional iaas":
+        return jsonify({
+            "fulfillmentMessages": [
+                {
+                    "text": {
+                        "text": ["Explore our Traditional IaaS providers:"]
+                    }
+                },
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                {
+                                    "type": "button",
+                                    "icon": {"type": "storage"},
+                                    "text": "Yotta",
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"
+                                },
+                                {
+                                    "type": "button",
+                                    "icon": {"type": "storage"},
+                                    "text": "Sify",
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"
+                                }
+                            ]
+                        ]
+                    }
+                }
+            ]
+        })
+
     # Fuzzy match user queries with known FAQ entries
     best_match, score = process.extractOne(user_query, faq.keys())
     if score >= 70:
