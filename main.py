@@ -82,9 +82,7 @@ def webhook():
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
-                    }
+                    "text": {"text": ["These are our services:"]}
                 },
                 {
                     "payload": {
@@ -115,6 +113,11 @@ def webhook():
                             }
                         ]]
                     }
+                },
+                {
+                    "text": {
+                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
+                    }
                 }
             ],
             "outputContexts": [
@@ -130,9 +133,7 @@ def webhook():
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
-                    }
+                    "text": {"text": ["These are our services:"]}
                 },
                 {
                     "payload": {
@@ -150,6 +151,11 @@ def webhook():
                                 "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"
                             }
                         ]]
+                    }
+                },
+                {
+                    "text": {
+                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
                     }
                 }
             ],
