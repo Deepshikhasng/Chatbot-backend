@@ -22,30 +22,27 @@ def webhook():
     req = request.get_json()
     intent = req['queryResult']['intent']['displayName']
     user_query = req['queryResult']['queryText'].lower()
+    session = req['session']
 
     # Default Welcome Intent – Send chip buttons
     if intent == "Default Welcome Intent":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["Hi! How can I assist you today?"]
-                    }
+                    "text": {"text": ["Hi! How can I assist you today?"]}
                 },
                 {
                     "payload": {
-                        "richContent": [
-                            [
-                                {
-                                    "type": "chips",
-                                    "options": [
-                                        {"text": "Basic Questions"},
-                                        {"text": "Service-related Questions"},
-                                        {"text": "Data Centre"}
-                                    ]
-                                }
-                            ]
-                        ]
+                        "richContent": [[
+                            {
+                                "type": "chips",
+                                "options": [
+                                    {"text": "Basic Questions"},
+                                    {"text": "Service-related Questions"},
+                                    {"text": "Data Centre"}
+                                ]
+                            }
+                        ]]
                     }
                 }
             ]
@@ -57,110 +54,110 @@ def webhook():
             "fulfillmentText": "Sure! Feel free to ask anything about our company or general topics. I'm here to help!"
         })
 
-    # Handle chip response: Service-related Questions → Show Hyperscaler & Traditional IaaS
+    # Service-related Questions → Show Hyperscaler & Traditional IaaS
     if user_query == "service-related questions":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["We provide these service types. Select one:"]
-                    }
+                    "text": {"text": ["We provide these service types. Select one:"]}
                 },
                 {
                     "payload": {
-                        "richContent": [
-                            [
-                                {
-                                    "type": "chips",
-                                    "options": [
-                                        {"text": "Hyperscaler"},
-                                        {"text": "Traditional IaaS"}
-                                    ]
-                                }
-                            ]
-                        ]
+                        "richContent": [[
+                            {
+                                "type": "chips",
+                                "options": [
+                                    {"text": "Hyperscaler"},
+                                    {"text": "Traditional IaaS"}
+                                ]
+                            }
+                        ]]
                     }
                 }
             ]
         })
 
-    # Handle Hyperscaler → Show 4 cloud platform buttons
+    # Hyperscaler → AWS, Azure, Oracle, Google Cloud
     if user_query == "hyperscaler":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["Explore our cloud providers:"]
-                    }
+                    "text": {"text": ["Explore our cloud providers:"]}
                 },
                 {
                     "payload": {
-                        "richContent": [
-                            [
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "cloud"},
-                                    "text": "AWS",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"
-                                },
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "cloud"},
-                                    "text": "Azure",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"
-                                },
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "cloud"},
-                                    "text": "Oracle",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"
-                                },
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "cloud"},
-                                    "text": "Google Cloud",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"
-                                }
-                            ]
-                        ]
+                        "richContent": [[
+                            {
+                                "type": "button",
+                                "icon": {"type": "cloud"},
+                                "text": "AWS",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"
+                            },
+                            {
+                                "type": "button",
+                                "icon": {"type": "cloud"},
+                                "text": "Azure",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"
+                            },
+                            {
+                                "type": "button",
+                                "icon": {"type": "cloud"},
+                                "text": "Oracle",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"
+                            },
+                            {
+                                "type": "button",
+                                "icon": {"type": "cloud"},
+                                "text": "Google Cloud",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"
+                            }
+                        ]]
                     }
+                }
+            ],
+            "outputContexts": [
+                {
+                    "name": f"{session}/contexts/end_session",
+                    "lifespanCount": 0
                 }
             ]
         })
 
-    # Handle Traditional IaaS → Show Yotta and Sify buttons
+    # Traditional IaaS → Yotta, Sify
     if user_query == "traditional iaas":
         return jsonify({
             "fulfillmentMessages": [
                 {
-                    "text": {
-                        "text": ["Explore our Traditional IaaS providers:"]
-                    }
+                    "text": {"text": ["Explore our Traditional IaaS providers:"]}
                 },
                 {
                     "payload": {
-                        "richContent": [
-                            [
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "storage"},
-                                    "text": "Yotta",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"
-                                },
-                                {
-                                    "type": "button",
-                                    "icon": {"type": "storage"},
-                                    "text": "Sify",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"
-                                }
-                            ]
-                        ]
+                        "richContent": [[
+                            {
+                                "type": "button",
+                                "icon": {"type": "storage"},
+                                "text": "Yotta",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"
+                            },
+                            {
+                                "type": "button",
+                                "icon": {"type": "storage"},
+                                "text": "Sify",
+                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"
+                            }
+                        ]]
                     }
+                }
+            ],
+            "outputContexts": [
+                {
+                    "name": f"{session}/contexts/end_session",
+                    "lifespanCount": 0
                 }
             ]
         })
 
-    # Fuzzy match user queries with known FAQ entries
+    # Fuzzy match user queries with FAQ
     best_match, score = process.extractOne(user_query, faq.keys())
     if score >= 70:
         response = faq[best_match]
