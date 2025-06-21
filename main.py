@@ -116,7 +116,7 @@ def webhook():
                 },
                 {
                     "text": {
-                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
+                        "text": ["You can select your required service or you can restart the chat by typing Hi or Restart!"]
                     }
                 }
             ],
@@ -155,7 +155,7 @@ def webhook():
                 },
                 {
                     "text": {
-                        "text": ["We’re opening your requested page. You can restart the chat by typing Hi or Restart!"]
+                        "text": ["You can select your required service or you can restart the chat by typing Hi or Restart!"]
                     }
                 }
             ],
