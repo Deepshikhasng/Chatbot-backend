@@ -56,12 +56,41 @@ def webhook():
         return jsonify({
             "fulfillmentText": "Sure! Feel free to ask anything about our company or general topics. I'm here to help!"
         })
+
+    # Handle chip response: Service-related Questions → Show Hyperscaler & Traditional IaaS
     if user_query == "service-related questions":
         return jsonify({
             "fulfillmentMessages": [
                 {
                     "text": {
-                        "text": ["We provide these services click any of the options below to explore our cloud services:"]
+                        "text": ["We provide these service types. Select one:"]
+                    }
+                },
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                {
+                                    "type": "chips",
+                                    "options": [
+                                        {"text": "Hyperscaler"},
+                                        {"text": "Traditional IaaS"}
+                                    ]
+                                }
+                            ]
+                        ]
+                    }
+                }
+            ]
+        })
+
+    # Handle Hyperscaler → Show 4 cloud platform buttons
+    if user_query == "hyperscaler":
+        return jsonify({
+            "fulfillmentMessages": [
+                {
+                    "text": {
+                        "text": ["Explore our cloud providers:"]
                     }
                 },
                 {
@@ -72,25 +101,25 @@ def webhook():
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "AWS",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Azure",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Oracle",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"
                                 },
                                 {
                                     "type": "button",
                                     "icon": {"type": "cloud"},
                                     "text": "Google Cloud",
-                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html"
+                                    "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"
                                 }
                             ]
                         ]
