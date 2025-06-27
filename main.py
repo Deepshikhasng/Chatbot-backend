@@ -84,17 +84,7 @@ def webhook():
     if user_query == "co-location":
         return jsonify({
             "fulfillmentText": (
-                "You selected Co-location. You can ask questions like:\n"
-                "- What is Data Center Colocation?\n"
-                "- Difference between Colocation and Cloud?\n"
-                "- Why choose Colocation?\n"
-                "- Who is Colocation ideal for?\n"
-                "- Considerations for Colocation provider\n"
-                "- Access to equipment\n"
-                "- Is Colocation scalable?\n"
-                "- Colocation vs On-premises security\n"
-                "- What are Remote Hands services?\n"
-                "- Disaster recovery with Colocation"
+                "You have selected Co-location. Kindly share your query related to Co-location, and I will be happy to assist you."
             )
         })
 
