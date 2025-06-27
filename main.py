@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from fuzzywuzzy import process
+import os
 
 app = Flask(__name__)
 
@@ -20,9 +21,10 @@ def index():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json()
-    intent = req['queryResult']['intent']['displayName']
-    user_query = req['queryResult']['queryText'].lower()
-    session = req['session']
+
+    intent = req.get('queryResult', {}).get('intent', {}).get('displayName', "")
+    user_query = req.get('queryResult', {}).get('queryText', "").lower()
+    session = req.get('session', "")
 
     # Default Welcome Intent – Send chip buttons
     if intent == "Default Welcome Intent":
@@ -40,7 +42,7 @@ def webhook():
                                     {"text": "Basic Questions"},
                                     {"text": "Service-related Questions"},
                                     {"text": "Data Centre"},
-                                    {"text": "Co-location"}  # New Button Added
+                                    {"text": "Co-location"}
                                 ]
                             }
                         ]]
@@ -48,7 +50,6 @@ def webhook():
                 }
             ]
         })
-
 
     # Basic Questions
     if user_query == "basic questions":
@@ -79,7 +80,25 @@ def webhook():
             ]
         })
 
-    # Hyperscaler
+    # Co-location Button Handling
+    if user_query == "co-location":
+        return jsonify({
+            "fulfillmentText": (
+                "You selected Co-location. You can ask questions like:\n"
+                "- What is Data Center Colocation?\n"
+                "- Difference between Colocation and Cloud?\n"
+                "- Why choose Colocation?\n"
+                "- Who is Colocation ideal for?\n"
+                "- Considerations for Colocation provider\n"
+                "- Access to equipment\n"
+                "- Is Colocation scalable?\n"
+                "- Colocation vs On-premises security\n"
+                "- What are Remote Hands services?\n"
+                "- Disaster recovery with Colocation"
+            )
+        })
+
+    # Hyperscaler Options
     if user_query == "hyperscaler":
         return jsonify({
             "fulfillmentMessages": [
@@ -117,9 +136,7 @@ def webhook():
                     }
                 },
                 {
-                    "text": {
-                        "text": ["You can select your required service or you can restart the chat by typing Hi or Restart!"]
-                    }
+                    "text": {"text": ["You can select your required service or restart the chat by typing Hi or Restart!"]}
                 }
             ],
             "outputContexts": [
@@ -130,7 +147,7 @@ def webhook():
             ]
         })
 
-    # Traditional IaaS
+    # Traditional IaaS Options
     if user_query == "traditional iaas":
         return jsonify({
             "fulfillmentMessages": [
@@ -156,9 +173,7 @@ def webhook():
                     }
                 },
                 {
-                    "text": {
-                        "text": ["You can select your required service or you can restart the chat by typing Hi or Restart!"]
-                    }
+                    "text": {"text": ["You can select your required service or restart the chat by typing Hi or Restart!"]}
                 }
             ],
             "outputContexts": [
@@ -169,15 +184,20 @@ def webhook():
             ]
         })
 
-    # Fuzzy matching
-    best_match, score = process.extractOne(user_query, faq.keys())
-    if score >= 70:
-        response = faq[best_match]
+    # Fuzzy matching for FAQ database
+    if faq:
+        best_match, score = process.extractOne(user_query, faq.keys())
+        if score >= 70:
+            response = faq[best_match]
+        else:
+            response = "Sorry, I didn't quite catch that. Could you please rephrase?"
     else:
-        response = "Sorry, I didn't quite catch that. Could you please rephrase?"
+        response = "Sorry, no FAQs found at the moment."
 
     return jsonify({"fulfillmentText": response})
 
+
 # Run the Flask app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get("PORT", 8080))  # Compatible for Render or local
+    app.run(host='0.0.0.0', port=port)
