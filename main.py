@@ -39,7 +39,8 @@ def webhook():
                                 "options": [
                                     {"text": "Basic Questions"},
                                     {"text": "Service-related Questions"},
-                                    {"text": "Data Centre"}
+                                    {"text": "Data Centre"},
+                                    {"text": "Co-location"}  # New Button Added
                                 ]
                             }
                         ]]
@@ -47,6 +48,7 @@ def webhook():
                 }
             ]
         })
+
 
     # Basic Questions
     if user_query == "basic questions":
