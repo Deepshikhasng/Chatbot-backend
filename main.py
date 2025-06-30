@@ -30,24 +30,15 @@ def webhook():
     if intent == "Default Welcome Intent":
         return jsonify({
             "fulfillmentMessages": [
-                {
-                    "text": {"text": ["Hi! How can I assist you today?"]}
-                },
-                {
-                    "payload": {
-                        "richContent": [[
-                            {
-                                "type": "chips",
-                                "options": [
-                                    {"text": "Basic Questions"},
-                                    {"text": "Service-related Questions"},
-                                    {"text": "Data Centre"},
-                                    {"text": "Co-location"}
-                                ]
-                            }
-                        ]]
-                    }
-                }
+                {"text": {"text": ["Hi! How can I assist you today?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "Basic Questions"},
+                        {"text": "Service-related Questions"},
+                        {"text": "Data Centre"},
+                        {"text": "Co-location"}
+                    ]}
+                ]]}}
             ]
         })
 
@@ -57,124 +48,83 @@ def webhook():
             "fulfillmentText": "Sure! Feel free to ask anything about our company or general topics. I'm here to help!"
         })
 
+    # Co-location
+    if user_query == "co-location":
+        return jsonify({
+            "fulfillmentText": "You have selected Co-location. Kindly share your query related to Co-location, and I will be happy to assist you."
+        })
+
     # Service-related Questions
     if user_query == "service-related questions":
         return jsonify({
             "fulfillmentMessages": [
-                {
-                    "text": {"text": ["We provide these service types. Select one:"]}
-                },
-                {
-                    "payload": {
-                        "richContent": [[
-                            {
-                                "type": "chips",
-                                "options": [
-                                    {"text": "Hyperscaler"},
-                                    {"text": "Traditional IaaS"}
-                                ]
-                            }
-                        ]]
-                    }
-                }
+                {"text": {"text": ["We provide these service types. Select one:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "Hyperscaler"},
+                        {"text": "Traditional IaaS"}
+                    ]}
+                ]]}}
             ]
-        })
-
-    # Co-location Button Handling
-    if user_query == "co-location":
-        return jsonify({
-            "fulfillmentText": (
-                "You have selected Co-location. Kindly share your query related to Co-location, and I will be happy to assist you."
-            )
         })
 
     # Hyperscaler Options
     if user_query == "hyperscaler":
         return jsonify({
             "fulfillmentMessages": [
-                {
-                    "text": {"text": ["These are our services:"]}
-                },
-                {
-                    "payload": {
-                        "richContent": [[
-                            {
-                                "type": "button",
-                                "icon": {"type": "cloud"},
-                                "text": "AWS",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"
-                            },
-                            {
-                                "type": "button",
-                                "icon": {"type": "cloud"},
-                                "text": "Azure",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"
-                            },
-                            {
-                                "type": "button",
-                                "icon": {"type": "cloud"},
-                                "text": "Oracle",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"
-                            },
-                            {
-                                "type": "button",
-                                "icon": {"type": "cloud"},
-                                "text": "Google Cloud",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"
-                            }
-                        ]]
-                    }
-                },
-                {
-                    "text": {"text": ["You can select your required service or restart the chat by typing Hi or Restart!"]}
-                }
+                {"text": {"text": ["These are our services:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"}
+                ]]}}
             ],
-            "outputContexts": [
-                {
-                    "name": f"{session}/contexts/end_session",
-                    "lifespanCount": 0
-                }
-            ]
+            "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
 
     # Traditional IaaS Options
     if user_query == "traditional iaas":
         return jsonify({
             "fulfillmentMessages": [
-                {
-                    "text": {"text": ["These are our services:"]}
-                },
-                {
-                    "payload": {
-                        "richContent": [[
-                            {
-                                "type": "button",
-                                "icon": {"type": "storage"},
-                                "text": "Yotta",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"
-                            },
-                            {
-                                "type": "button",
-                                "icon": {"type": "storage"},
-                                "text": "Sify",
-                                "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"
-                            }
-                        ]]
-                    }
-                },
-                {
-                    "text": {"text": ["You can select your required service or restart the chat by typing Hi or Restart!"]}
-                }
+                {"text": {"text": ["These are our services:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "button", "icon": {"type": "storage"}, "text": "Yotta", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"},
+                    {"type": "button", "icon": {"type": "storage"}, "text": "Sify", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"}
+                ]]}}
             ],
-            "outputContexts": [
-                {
-                    "name": f"{session}/contexts/end_session",
-                    "lifespanCount": 0
-                }
+            "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
+        })
+
+    # Data Centre Definition + Yes/No Options
+    if user_query == "data centre":
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["A Data Centre is a facility that centralizes an organization’s IT operations and equipment for storing, processing, and managing data."]}},
+                {"text": {"text": ["Would you like to continue exploring Data Centre services?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "Yes"},
+                        {"text": "No"}
+                    ]}
+                ]]}}
             ]
         })
 
-    # Fuzzy matching for FAQ database
+    # If user says No → Exit chat
+    if user_query == "no":
+        return jsonify({
+            "fulfillmentText": "Thank you for your time! You can restart the chat anytime by typing Hi or Restart.",
+            "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
+        })
+
+    # If user says Yes → Ask for details
+    if user_query == "yes":
+        return jsonify({
+            "fulfillmentText": "Great! Please share your Name, Contact Number, and Email so we can assist you with Data Centre services."
+        })
+
+    # Fuzzy matching for FAQ
     if faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
@@ -187,7 +137,7 @@ def webhook():
     return jsonify({"fulfillmentText": response})
 
 
-# Run the Flask app
+# Run Flask
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))  # Compatible for Render or local
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
