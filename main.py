@@ -4,6 +4,8 @@ import os
 
 app = Flask(__name__)
 
+user_details = {}  # Temporary store for user data
+
 # FAQ database
 faq = {
     "can i upgrade or downgrade my plan": "Yes, our flexible plans allow you to easily upgrade your services at any time.",
@@ -21,13 +23,18 @@ def index():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json()
-
     intent = req.get('queryResult', {}).get('intent', {}).get('displayName', "")
     user_query = req.get('queryResult', {}).get('queryText', "").lower()
     session = req.get('session', "")
 
-    # Default Welcome Intent – Send chip buttons
+    if session not in user_details:
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+
+    step = user_details[session]["step"]
+
+    # Default Welcome Intent
     if intent == "Default Welcome Intent":
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! How can I assist you today?"]}},
@@ -96,7 +103,7 @@ def webhook():
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
 
-    # Data Centre Definition + Yes/No Options
+    # Data Centre Flow
     if user_query == "data centre":
         return jsonify({
             "fulfillmentMessages": [
@@ -111,18 +118,59 @@ def webhook():
             ]
         })
 
-    # If user says No → Exit chat
+    # Exit if user says No
     if user_query == "no":
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
         return jsonify({
             "fulfillmentText": "Thank you for your time! You can restart the chat anytime by typing Hi or Restart.",
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
 
-    # If user says Yes → Ask for details
+    # Begin asking details
     if user_query == "yes":
+        user_details[session]["step"] = "ask_name"
+        return jsonify({"fulfillmentText": "Great! Please share your Name."})
+
+    # Collect Name
+    if step == "ask_name":
+        user_details[session]["name"] = user_query
+        user_details[session]["step"] = "ask_contact"
+        return jsonify({"fulfillmentText": "Thanks! Now please share your Contact Number."})
+
+    # Collect Contact
+    if step == "ask_contact":
+        user_details[session]["contact"] = user_query
+        user_details[session]["step"] = "ask_email"
+        return jsonify({"fulfillmentText": "Got it! Finally, please share your Email address."})
+
+    # Collect Email and show New/Existing
+    if step == "ask_email":
+        user_details[session]["email"] = user_query
+        collected = user_details[session]
+        user_details[session]["step"] = "done"
+
+        print(f"Data Collected for {session}: {collected}")
+
         return jsonify({
-            "fulfillmentText": "Great! Please share your Name, Contact Number, and Email so we can assist you with Data Centre services."
+            "fulfillmentMessages": [
+                {"text": {"text": [f"Thank you {collected['name']}! We have your details:\nContact: {collected['contact']}\nEmail: {collected['email']}"]}},
+                {"text": {"text": ["Are you a New customer or Existing one?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "New"},
+                        {"text": "Existing"}
+                    ]}
+                ]]}}
+            ]
         })
+
+    if user_query == "new":
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        return jsonify({"fulfillmentText": "Thank you! Our team will assist you as a new customer shortly."})
+
+    if user_query == "existing":
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        return jsonify({"fulfillmentText": "Thank you! Our support team will assist you shortly as an existing customer."})
 
     # Fuzzy matching for FAQ
     if faq:
@@ -135,7 +183,6 @@ def webhook():
         response = "Sorry, no FAQs found at the moment."
 
     return jsonify({"fulfillmentText": response})
-
 
 # Run Flask
 if __name__ == "__main__":
