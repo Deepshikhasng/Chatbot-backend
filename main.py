@@ -3,17 +3,21 @@ from fuzzywuzzy import process
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import os
+import json
 
 app = Flask(__name__)
 
 user_details = {}
 
-# Google Sheets Setup
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CRED_PATH = os.path.join(BASE_DIR, "credentials", "chatbotuserdata-93b488d01c56.json")
-
+# Google Sheets Setup using Environment Variable
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(CRED_PATH, scope)
+
+google_creds_raw = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+if not google_creds_raw:
+    raise Exception("Google Credentials not found in environment variables.")
+
+google_creds_dict = json.loads(google_creds_raw)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("chatbot_userdata").sheet1
 
