@@ -9,18 +9,13 @@ app = Flask(__name__)
 user_details = {}
 
 # Google Sheets Setup
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-import os
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CRED_PATH = os.path.join(BASE_DIR, "credentials", "chatbotuserdata-93b488d01c56.json")
 
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name(CRED_PATH, scope)
 client = gspread.authorize(creds)
-  # Replace your JSON file name
-client = gspread.authorize(creds)
-sheet = client.open("chatbot_userdata").sheet1  # Replace with your Google Sheet name
+sheet = client.open("chatbot_userdata").sheet1
 
 # FAQ database
 faq = {
@@ -48,7 +43,6 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Default Welcome Intent
     if intent == "Default Welcome Intent":
         user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
         return jsonify({
@@ -65,15 +59,12 @@ def webhook():
             ]
         })
 
-    # Basic Questions
     if user_query == "basic questions":
         return jsonify({"fulfillmentText": "Sure! Feel free to ask anything about our company or general topics."})
 
-    # Co-location
     if user_query == "co-location":
         return jsonify({"fulfillmentText": "You have selected Co-location. Kindly share your query related to Co-location, and I will be happy to assist you."})
 
-    # Service-related Questions
     if user_query == "service-related questions":
         return jsonify({
             "fulfillmentMessages": [
@@ -84,7 +75,6 @@ def webhook():
             ]
         })
 
-    # Hyperscaler
     if user_query == "hyperscaler":
         return jsonify({
             "fulfillmentMessages": [
@@ -99,7 +89,6 @@ def webhook():
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
 
-    # Traditional IaaS
     if user_query == "traditional iaas":
         return jsonify({
             "fulfillmentMessages": [
@@ -112,7 +101,6 @@ def webhook():
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
 
-    # Data Centre Flow
     if user_query == "data centre":
         return jsonify({
             "fulfillmentMessages": [
@@ -133,32 +121,33 @@ def webhook():
 
     if user_query == "yes":
         user_details[session]["step"] = "ask_name"
-        return jsonify({"fulfillmentText": "Great! Please share your Name."})
+        return jsonify({"fulfillmentText": "Great! Please enter your Name."})
 
     if step == "ask_name":
-        user_details[session]["name"] = user_query
+        user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact"
-        return jsonify({"fulfillmentText": "Thanks! Now please share your Contact Number."})
+        return jsonify({"fulfillmentText": "Thank you! Now, please enter your Contact Number."})
 
     if step == "ask_contact":
         user_details[session]["contact"] = user_query
         user_details[session]["step"] = "ask_email"
-        return jsonify({"fulfillmentText": "Got it! Finally, please share your Email address."})
+        return jsonify({"fulfillmentText": "Almost done! Please enter your Email address."})
 
     if step == "ask_email":
         user_details[session]["email"] = user_query
         collected = user_details[session]
 
-        # Store in Google Sheet
         try:
             sheet.append_row([collected["name"], collected["contact"], collected["email"]])
+            msg = f"Thank you {collected['name']}! We have stored your details.\nContact: {collected['contact']}\nEmail: {collected['email']}"
         except Exception as e:
             print(f"Error storing to sheet: {e}")
+            msg = "Thank you! However, there was an issue storing your details."
 
         user_details[session]["step"] = "done"
         return jsonify({
             "fulfillmentMessages": [
-                {"text": {"text": [f"Thank you {collected['name']}! We have your details:\nContact: {collected['contact']}\nEmail: {collected['email']}"]}},
+                {"text": {"text": [msg]}},
                 {"text": {"text": ["Are you a New customer or Existing one?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "New"}, {"text": "Existing"}]}
@@ -174,7 +163,6 @@ def webhook():
         user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
         return jsonify({"fulfillmentText": "Thank you! Our support team will assist you shortly as an existing customer."})
 
-    # Fuzzy matching for FAQ
     if faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
@@ -184,7 +172,6 @@ def webhook():
 
     return jsonify({"fulfillmentText": "I'm not sure how to help with that. Please try again."})
 
-# Run Flask
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
