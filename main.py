@@ -10,7 +10,15 @@ user_details = {}
 
 # Google Sheets Setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("chatbotuserdata-93b488d01c56.json", scope)  # Replace your JSON file name
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CRED_PATH = os.path.join(BASE_DIR, "credentials", "chatbotuserdata-93b488d01c56.json")
+
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name(CRED_PATH, scope)
+client = gspread.authorize(creds)
+  # Replace your JSON file name
 client = gspread.authorize(creds)
 sheet = client.open("chatbot_userdata").sheet1  # Replace with your Google Sheet name
 
