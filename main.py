@@ -125,7 +125,7 @@ def webhook():
 
     if user_query == "yes":
         user_details[session]["step"] = "ask_name"
-        return jsonify({"fulfillmentText": "Great! Please enter your Name."})
+        return jsonify({"fulfillmentText": "Great! Please share your Name."})
 
     if step == "ask_name":
         user_details[session]["name"] = user_query.title()
