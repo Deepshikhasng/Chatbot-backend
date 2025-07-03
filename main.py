@@ -9,11 +9,13 @@ app = Flask(__name__)
 
 user_details = {}
 
-# Google Sheets Setup
+# Google Sheets Setup using Environment Variable
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+
 google_creds_raw = os.environ.get("GOOGLE_CREDENTIALS_JSON")
 if not google_creds_raw:
     raise Exception("Google Credentials not found in environment variables.")
+
 google_creds_dict = json.loads(google_creds_raw)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds_dict, scope)
 client = gspread.authorize(creds)
@@ -41,12 +43,12 @@ def webhook():
     session = req.get('session', "")
 
     if session not in user_details:
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
 
     step = user_details[session]["step"]
 
     if intent == "Default Welcome Intent":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! What would you like to ask about?"]}},
@@ -55,12 +57,12 @@ def webhook():
                         {"text": "Basic FAQs"},
                         {"text": "Service Available"}
                     ]}
-                ]]} }
+                ]]}}
             ]
         })
 
     if user_query == "basic faqs":
-        return jsonify({"fulfillmentText": "Sure! Feel free to ask anything from our Frequently Asked Questions."})
+        return jsonify({"fulfillmentText": "Sure! You can ask any general questions about our services."})
 
     if user_query == "service available":
         return jsonify({
@@ -69,15 +71,14 @@ def webhook():
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [
                         {"text": "Data Centre"},
-                        {"text": "Cloud"},
+                        {"text": "Cloud Services"},
                         {"text": "Dedicated Server"},
                         {"text": "Co-location"}
                     ]}
-                ]]} }
+                ]]}}
             ]
         })
 
-    # Data Centre Flow
     if user_query == "data centre":
         user_details[session]["step"] = "ask_name"
         return jsonify({"fulfillmentText": "Great! Please share your Name."})
@@ -96,31 +97,30 @@ def webhook():
 
     if step == "ask_email":
         user_details[session]["email"] = user_query
-        collected = user_details[session]
-
         try:
-            sheet.append_row([collected["name"], collected["contact"], collected["email"]])
+            sheet.append_row([
+                user_details[session]["name"],
+                user_details[session]["contact"],
+                user_details[session]["email"]
+            ])
         except Exception as e:
             print(f"Error storing to sheet: {e}")
-
-        user_details[session]["step"] = "ask_solution_type"
+        user_details[session]["step"] = "ask_solution"
         return jsonify({
             "fulfillmentMessages": [
-                {"text": {"text": [f"Thank you {collected['name']}! Your details have been recorded."]}},
-                {"text": {"text": ["Are you interested in On-Premises or On-Cloud solutions?"]}},
+                {"text": {"text": ["Thank you! Are you interested in On-Premises or On-Cloud?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [
                         {"text": "On-Premises"},
                         {"text": "On-Cloud"}
                     ]}
-                ]]} }
+                ]]}}
             ]
         })
 
-    if step == "ask_solution_type":
-        if user_query.lower() == "on-premises":
-            user_details[session]["solution_type"] = "On-Premises"
-            user_details[session]["step"] = "ask_customer_type"
+    if step == "ask_solution":
+        if user_query == "on-premises":
+            user_details[session]["step"] = "onprem_new_existing"
             return jsonify({
                 "fulfillmentMessages": [
                     {"text": {"text": ["Are you a New or Existing customer?"]}},
@@ -129,31 +129,31 @@ def webhook():
                             {"text": "New"},
                             {"text": "Existing"}
                         ]}
-                    ]]} }
+                    ]]}}
                 ]
             })
-        elif user_query.lower() == "on-cloud":
-            user_details[session]["solution_type"] = "On-Cloud"
-            user_details[session]["step"] = "ask_oncloud_option"
+
+        if user_query == "on-cloud":
+            user_details[session]["step"] = "cloud_dc_dr"
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["Please select your On-Cloud option:"]}},
+                    {"text": {"text": ["Please select one option:"]}},
                     {"payload": {"richContent": [[
                         {"type": "chips", "options": [
                             {"text": "DC"},
                             {"text": "DR"},
                             {"text": "Both"}
                         ]}
-                    ]]} }
+                    ]]}}
                 ]
             })
 
-    if step == "ask_customer_type":
-        if user_query.lower() == "new":
-            user_details[session]["step"] = "ask_dc_dr"
+    if step == "onprem_new_existing":
+        if user_query == "new":
+            user_details[session]["step"] = "onprem_new_options"
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["Please select your requirement:"]}},
+                    {"text": {"text": ["Please select DC, DR, Both, or Back:"]}},
                     {"payload": {"richContent": [[
                         {"type": "chips", "options": [
                             {"text": "DC"},
@@ -161,105 +161,80 @@ def webhook():
                             {"text": "Both"},
                             {"text": "Back"}
                         ]}
-                    ]]} }
+                    ]]}}
                 ]
             })
-        elif user_query.lower() == "existing":
-            user_details[session]["step"] = "ask_existing_req"
-            return jsonify({"fulfillmentText": "Kindly explain your requirements for our team to assist you."})
 
-    if step == "ask_dc_dr":
+        if user_query == "existing":
+            user_details[session]["step"] = "existing_requirement"
+            return jsonify({"fulfillmentText": "Kindly explain your requirements."})
+
+    if step == "existing_requirement":
+        try:
+            sheet.append_row([
+                user_details[session]["name"],
+                user_details[session]["contact"],
+                user_details[session]["email"],
+                "Requirement of existing user",
+                user_query
+            ])
+        except Exception as e:
+            print(f"Error storing to sheet: {e}")
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
+        return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
+
+    if step == "onprem_new_options":
         if user_query.lower() in ["dc", "dr", "both"]:
-            user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
             return jsonify({"fulfillmentText": f"Thank you for choosing {user_query.upper()} services. Our team will contact you shortly."})
         if user_query.lower() == "back":
-            user_details[session]["step"] = "ask_customer_type"
-            return jsonify({
-                "fulfillmentMessages": [
-                    {"text": {"text": ["Are you a New or Existing customer?"]}},
-                    {"payload": {"richContent": [[
-                        {"type": "chips", "options": [
-                            {"text": "New"},
-                            {"text": "Existing"}
-                        ]}
-                    ]]} }
-                ]
-            })
+            user_details[session]["step"] = "onprem_new_existing"
+            return jsonify({"fulfillmentText": "Are you a New or Existing customer?"})
 
-    if step == "ask_existing_req":
-        try:
-            sheet.append_row(["Existing Customer Requirement", user_query])
-        except Exception as e:
-            print(f"Error storing requirement: {e}")
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
-        return jsonify({"fulfillmentText": "Thank you! Your requirement has been noted. Our team will contact you shortly."})
-
-    # On-Cloud extended flow
-    if step == "ask_oncloud_option":
+    if step == "cloud_dc_dr":
         if user_query.lower() in ["dc", "dr", "both"]:
-            user_details[session]["oncloud_option"] = user_query.upper()
-            user_details[session]["step"] = "ask_oncloud_service"
+            user_details[session]["step"] = "cloud_service_type"
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["Please select a service type:"]}},
+                    {"text": {"text": ["Please choose service type:"]}},
                     {"payload": {"richContent": [[
                         {"type": "chips", "options": [
                             {"text": "Hyperscaler"},
                             {"text": "Traditional IAAS"}
                         ]}
-                    ]]} }
+                    ]]}}
                 ]
             })
 
-    if step == "ask_oncloud_service":
+    if step == "cloud_service_type":
         if user_query.lower() == "hyperscaler":
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["These are our Hyperscaler services:"]}},
+                    {"text": {"text": ["Select your provider:"]}},
                     {"payload": {"richContent": [[
                         {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://example.com/aws"},
                         {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://example.com/azure"},
                         {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://example.com/googlecloud"},
                         {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://example.com/oracle"}
-                    ]]} }
+                    ]]}}
                 ]
             })
-        elif user_query.lower() == "traditional iaas":
-            user_details[session]["step"] = "ask_traditional_req"
-            return jsonify({"fulfillmentText": "Kindly share your requirements for Traditional IAAS."})
 
-    if step == "ask_traditional_req":
+        if user_query.lower() == "traditional iaas":
+            user_details[session]["step"] = "trad_iaas_req"
+            return jsonify({"fulfillmentText": "Kindly explain your requirement for Traditional IAAS."})
+
+    if step == "trad_iaas_req":
         try:
-            sheet.append_row(["Requirement of Traditional IAAS", user_query])
+            sheet.append_row([
+                user_details[session]["name"],
+                user_details[session]["contact"],
+                user_details[session]["email"],
+                "Requirement of Traditional IAAS",
+                user_query
+            ])
         except Exception as e:
-            print(f"Error storing Traditional IAAS requirement: {e}")
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
-        return jsonify({"fulfillmentText": "Thank you! Your requirement has been noted. Our team will contact you shortly."})
-
-    # Dedicated Server & Co-location placeholders
-    if user_query == "dedicated server":
-        return jsonify({"fulfillmentText": "You selected Dedicated Server. Kindly share your requirements."})
-
-    if user_query == "co-location":
-        return jsonify({
-            "fulfillmentMessages": [
-                {"text": {"text": ["Are you a New or Existing customer?"]}},
-                {"payload": {"richContent": [[
-                    {"type": "chips", "options": [
-                        {"text": "New"},
-                        {"text": "Existing"}
-                    ]}
-                ]]} }
-            ]
-        })
-
-    # FAQ fallback if no specific flow is ongoing
-    if not step and faq:
-        best_match, score = process.extractOne(user_query, faq.keys())
-        if score >= 70:
-            return jsonify({"fulfillmentText": faq[best_match]})
-        else:
-            return jsonify({"fulfillmentText": "Sorry, I didn't quite catch that. Could you please rephrase?"})
+            print(f"Error storing to sheet: {e}")
+        return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
 
     return jsonify({"fulfillmentText": "I'm not sure how to help with that. Please try again."})
 
