@@ -39,7 +39,7 @@ def index():
 def webhook():
     req = request.get_json()
     intent = req.get('queryResult', {}).get('intent', {}).get('displayName', "")
-    user_query = req.get('queryResult', {}).get('queryText', "").lower()
+    user_query = req.get('queryResult', {}).get('queryText', "").lower().strip()
     session = req.get('session', "")
 
     if session not in user_details:
@@ -47,7 +47,6 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Default Welcome Intent
     if intent == "Default Welcome Intent":
         user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({
@@ -64,7 +63,6 @@ def webhook():
             ]
         })
 
-    # Basic structured flows
     if user_query == "basic questions":
         return jsonify({"fulfillmentText": "Sure! Feel free to ask anything about our company or general topics."})
 
@@ -164,7 +162,7 @@ def webhook():
         })
 
     if step == "ask_solution":
-        if user_query.lower() in ["on-premises", "cloud"]:
+        if user_query in ["on-premises", "cloud"]:
             user_details[session]["solution_type"] = user_query.capitalize()
             user_details[session]["step"] = "ask_service"
             return jsonify({
@@ -176,9 +174,8 @@ def webhook():
                 ]
             })
 
-
     if step == "ask_service":
-        if user_query.lower() in ["dc", "dr", "both"]:
+        if user_query in ["dc", "dr", "both"]:
             solution = user_details[session]["solution_type"]
             user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
             return jsonify({"fulfillmentText": f"Thank you for choosing {solution} with {user_query.upper()} services. Our team will contact you shortly."})
@@ -187,7 +184,6 @@ def webhook():
         user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({"fulfillmentText": "Thank you! Our support team will assist you shortly as an existing customer."})
 
-    # Fuzzy matching for general queries
     if not step and faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
