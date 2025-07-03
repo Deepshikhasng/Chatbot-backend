@@ -130,15 +130,17 @@ def webhook():
     if step == "ask_name":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact"
-        return jsonify({"fulfillmentText": "Thank you! Now, please enter your 10 digit Contact Number."})
+        return jsonify({"fulfillmentText": "Thank you! Now, please enter your 10-digit Contact Number."})
 
     if step == "ask_contact":
         if not user_query.isdigit() or len(user_query) != 10:
-            return jsonify({"fulfillmentText": "Please enter a valid 10-digit Contact Number."})
+         # Do not change the step, keep asking for contact number
+            return jsonify({"fulfillmentText": "❗ Please enter a valid 10-digit Contact Number."})
 
         user_details[session]["contact"] = user_query
         user_details[session]["step"] = "ask_email"
         return jsonify({"fulfillmentText": "Almost done! Please enter your Email address."})
+
 
 
     if step == "ask_email":
