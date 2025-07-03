@@ -57,11 +57,9 @@ def webhook():
                         {"text": "Basic Questions"},
                         {"text": "Service-related Questions"},
                         {"text": "Data Centre"},
-                        {"text": "Co-location"},
-                        {"text": "On-Premises"},
-                        {"text": "Cloud"}
+                        {"text": "Co-location"}
                     ]}
-                ]]}}
+                ]]} }
             ]
         })
 
@@ -86,10 +84,10 @@ def webhook():
             "fulfillmentMessages": [
                 {"text": {"text": ["These are our services:"]}},
                 {"payload": {"richContent": [[
-                    {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#aws"},
-                    {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#azure"},
-                    {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#oracle"},
-                    {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#googlecloud"}
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://example.com/aws"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://example.com/azure"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://example.com/oracle"},
+                    {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://example.com/googlecloud"}
                 ]]}}
             ],
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
@@ -100,8 +98,8 @@ def webhook():
             "fulfillmentMessages": [
                 {"text": {"text": ["These are our services:"]}},
                 {"payload": {"richContent": [[
-                    {"type": "button", "icon": {"type": "storage"}, "text": "Yotta", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#yotta"},
-                    {"type": "button", "icon": {"type": "storage"}, "text": "Sify", "link": "https://upgraded-lamp-g47qqww45p99fpvqv-5500.app.github.dev/newer_index_testng.html#sify"}
+                    {"type": "button", "icon": {"type": "storage"}, "text": "Yotta", "link": "https://example.com/yotta"},
+                    {"type": "button", "icon": {"type": "storage"}, "text": "Sify", "link": "https://example.com/sify"}
                 ]]}}
             ],
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
@@ -114,20 +112,6 @@ def webhook():
                 {"text": {"text": ["Would you like to continue exploring Data Centre services?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "Yes"}, {"text": "No"}]}
-                ]]}}
-            ]
-        })
-
-    if user_query == "on-premises" or user_query == "cloud":
-        return jsonify({
-            "fulfillmentMessages": [
-                {"text": {"text": [f"You selected {user_query.capitalize()}. Please choose a service type:"]}},
-                {"payload": {"richContent": [[
-                    {"type": "chips", "options": [
-                        {"text": "DC"},
-                        {"text": "DR"},
-                        {"text": "Both"}
-                    ]}
                 ]]}}
             ]
         })
@@ -176,8 +160,27 @@ def webhook():
         })
 
     if user_query == "new":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
-        return jsonify({"fulfillmentText": "Thank you! Our team will assist you as a new customer shortly."})
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["Are you interested in On-Premises or Cloud solutions?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [{"text": "On-Premises"}, {"text": "Cloud"}]}
+                ]]}}
+            ]
+        })
+
+    if user_query in ["on-premises", "cloud"]:
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": [f"You selected {user_query.capitalize()}. Please choose an option:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [{"text": "DC"}, {"text": "DR"}, {"text": "Both"}]}
+                ]]}}
+            ]
+        })
+
+    if user_query in ["dc", "dr", "both"]:
+        return jsonify({"fulfillmentText": f"Thank you for your interest in {user_query.upper()} services. Our team will contact you shortly."})
 
     if user_query == "existing":
         user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
