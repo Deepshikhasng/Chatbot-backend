@@ -41,12 +41,12 @@ def webhook():
     session = req.get('session', "")
 
     if session not in user_details:
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
 
     step = user_details[session]["step"]
 
     if intent == "Default Welcome Intent":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! What would you like to ask about?"]}},
@@ -59,11 +59,9 @@ def webhook():
             ]
         })
 
-    # Basic FAQs flow
     if user_query == "basic faqs":
         return jsonify({"fulfillmentText": "Sure! Feel free to ask anything from our Frequently Asked Questions."})
 
-    # Service Available flow
     if user_query == "service available":
         return jsonify({
             "fulfillmentMessages": [
@@ -136,7 +134,19 @@ def webhook():
             })
         elif user_query.lower() == "on-cloud":
             user_details[session]["solution_type"] = "On-Cloud"
-            return jsonify({"fulfillmentText": "Cloud redirection will be added soon."})
+            user_details[session]["step"] = "ask_oncloud_option"
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Please select your On-Cloud option:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [
+                            {"text": "DC"},
+                            {"text": "DR"},
+                            {"text": "Both"}
+                        ]}
+                    ]]} }
+                ]
+            })
 
     if step == "ask_customer_type":
         if user_query.lower() == "new":
@@ -160,7 +170,7 @@ def webhook():
 
     if step == "ask_dc_dr":
         if user_query.lower() in ["dc", "dr", "both"]:
-            user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": ""}
+            user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
             return jsonify({"fulfillmentText": f"Thank you for choosing {user_query.upper()} services. Our team will contact you shortly."})
         if user_query.lower() == "back":
             user_details[session]["step"] = "ask_customer_type"
@@ -181,13 +191,52 @@ def webhook():
             sheet.append_row(["Existing Customer Requirement", user_query])
         except Exception as e:
             print(f"Error storing requirement: {e}")
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
         return jsonify({"fulfillmentText": "Thank you! Your requirement has been noted. Our team will contact you shortly."})
 
-    # Cloud option under "Service Available" (empty for now)
-    if user_query == "cloud":
-        return jsonify({"fulfillmentText": "Cloud option selected. Redirection will be added shortly."})
+    # On-Cloud extended flow
+    if step == "ask_oncloud_option":
+        if user_query.lower() in ["dc", "dr", "both"]:
+            user_details[session]["oncloud_option"] = user_query.upper()
+            user_details[session]["step"] = "ask_oncloud_service"
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Please select a service type:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [
+                            {"text": "Hyperscaler"},
+                            {"text": "Traditional IAAS"}
+                        ]}
+                    ]]} }
+                ]
+            })
 
+    if step == "ask_oncloud_service":
+        if user_query.lower() == "hyperscaler":
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["These are our Hyperscaler services:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://example.com/aws"},
+                        {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://example.com/azure"},
+                        {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://example.com/googlecloud"},
+                        {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://example.com/oracle"}
+                    ]]} }
+                ]
+            })
+        elif user_query.lower() == "traditional iaas":
+            user_details[session]["step"] = "ask_traditional_req"
+            return jsonify({"fulfillmentText": "Kindly share your requirements for Traditional IAAS."})
+
+    if step == "ask_traditional_req":
+        try:
+            sheet.append_row(["Requirement of Traditional IAAS", user_query])
+        except Exception as e:
+            print(f"Error storing Traditional IAAS requirement: {e}")
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": "", "customer_type": "", "oncloud_option": ""}
+        return jsonify({"fulfillmentText": "Thank you! Your requirement has been noted. Our team will contact you shortly."})
+
+    # Dedicated Server & Co-location placeholders
     if user_query == "dedicated server":
         return jsonify({"fulfillmentText": "You selected Dedicated Server. Kindly share your requirements."})
 
