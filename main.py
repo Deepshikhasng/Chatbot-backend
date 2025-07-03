@@ -23,12 +23,12 @@ sheet = client.open("chatbot_userdata").sheet1
 
 # FAQ database
 faq = {
-    "can i upgrade or downgrade my plan": "Yes, our flexible plans allow you to easily upgrade anytime.",
-    "what is cloud hosting": "Cloud hosting uses virtual servers on the internet, offering scalability and uptime.",
-    "do you offer technical support": "Yes, our team offers 24/7 technical support.",
-    "what are your service hours": "Our services are available 24/7, including holidays.",
+    "can i upgrade or downgrade my plan": "Yes, our flexible plans allow easy upgrades.",
+    "what is cloud hosting": "Cloud hosting uses virtual servers on the internet, offering scalability.",
+    "do you offer technical support": "Yes, 24/7 technical support is available.",
+    "what are your service hours": "We are available 24/7, including holidays.",
     "how can i cancel my subscription": "Cancel anytime via your dashboard or by contacting support.",
-    "do you offer custom plans": "Yes, we provide customized plans. Contact our sales team for details."
+    "do you offer custom plans": "Yes, customized plans are available. Contact sales for details."
 }
 
 @app.route('/')
@@ -38,13 +38,19 @@ def index():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json()
+    intent = req.get('queryResult', {}).get('intent', {}).get('displayName', "")
     user_query = req.get('queryResult', {}).get('queryText', "").lower()
     session = req.get('session', "")
 
     if session not in user_details:
-        user_details[session] = {"step": "ask_name", "name": "", "contact": "", "email": "", "row_number": None}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "row_number": None}
 
     step = user_details[session]["step"]
+
+    # Handle greeting on Welcome Intent
+    if intent == "Default Welcome Intent":
+        user_details[session] = {"step": "ask_name", "name": "", "contact": "", "email": "", "row_number": None}
+        return jsonify({"fulfillmentText": "Hi! Welcome to our services. May I know your Name?"})
 
     # Step 1: Ask Name
     if step == "ask_name":
@@ -83,7 +89,7 @@ def webhook():
     # Main Menu
     if step == "main_menu":
         if user_query == "basic faq":
-            return jsonify({"fulfillmentText": "Sure! Ask your question. Example: What is cloud hosting?"})
+            return jsonify({"fulfillmentText": "Sure! You can ask general questions like 'What is cloud hosting'."})
         
         if user_query == "service available":
             user_details[session]["step"] = "service_options"
@@ -104,7 +110,7 @@ def webhook():
     # Service Options
     if step == "service_options":
         if user_query == "data centre":
-            return jsonify({"fulfillmentText": "Data Centre centralizes IT operations for data management."})
+            return jsonify({"fulfillmentText": "A Data Centre centralizes IT operations for managing your data."})
 
         if user_query == "cloud services":
             user_details[session]["step"] = "cloud_options"
