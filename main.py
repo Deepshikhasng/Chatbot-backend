@@ -176,6 +176,7 @@ def webhook():
                 ]
             })
 
+
     if step == "ask_service":
         if user_query.lower() in ["dc", "dr", "both"]:
             solution = user_details[session]["solution_type"]
