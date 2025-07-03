@@ -43,12 +43,13 @@ def webhook():
     session = req.get('session', "")
 
     if session not in user_details:
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
 
     step = user_details[session]["step"]
 
+    # Default Welcome Intent
     if intent == "Default Welcome Intent":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! How can I assist you today?"]}},
@@ -63,6 +64,7 @@ def webhook():
             ]
         })
 
+    # Basic structured flows
     if user_query == "basic questions":
         return jsonify({"fulfillmentText": "Sure! Feel free to ask anything about our company or general topics."})
 
@@ -75,7 +77,7 @@ def webhook():
                 {"text": {"text": ["We provide these service types. Select one:"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "Hyperscaler"}, {"text": "Traditional IaaS"}]}
-                ]]}}
+                ]]} }
             ]
         })
 
@@ -88,7 +90,7 @@ def webhook():
                     {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://example.com/azure"},
                     {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://example.com/oracle"},
                     {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://example.com/googlecloud"}
-                ]]}}
+                ]]} }
             ],
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
@@ -100,7 +102,7 @@ def webhook():
                 {"payload": {"richContent": [[
                     {"type": "button", "icon": {"type": "storage"}, "text": "Yotta", "link": "https://example.com/yotta"},
                     {"type": "button", "icon": {"type": "storage"}, "text": "Sify", "link": "https://example.com/sify"}
-                ]]}}
+                ]]} }
             ],
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
         })
@@ -112,12 +114,12 @@ def webhook():
                 {"text": {"text": ["Would you like to continue exploring Data Centre services?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "Yes"}, {"text": "No"}]}
-                ]]}}
+                ]]} }
             ]
         })
 
     if user_query == "no":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({
             "fulfillmentText": "Thank you for your time! You can restart the chat anytime by typing Hi or Restart.",
             "outputContexts": [{"name": f"{session}/contexts/end_session", "lifespanCount": 0}]
@@ -134,14 +136,10 @@ def webhook():
 
     if step == "ask_contact":
         if not user_query.isdigit() or len(user_query) != 10:
-         # Do not change the step, keep asking for contact number
             return jsonify({"fulfillmentText": "❗ Please enter a valid 10-digit Contact Number."})
-
         user_details[session]["contact"] = user_query
         user_details[session]["step"] = "ask_email"
         return jsonify({"fulfillmentText": "Almost done! Please enter your Email address."})
-
-
 
     if step == "ask_email":
         user_details[session]["email"] = user_query
@@ -154,45 +152,42 @@ def webhook():
             print(f"Error storing to sheet: {e}")
             msg = "Thank you! However, there was an issue storing your details."
 
-        user_details[session]["step"] = "done"
+        user_details[session]["step"] = "ask_solution"
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": [msg]}},
-                {"text": {"text": ["Are you a New customer or Existing one?"]}},
-                {"payload": {"richContent": [[
-                    {"type": "chips", "options": [{"text": "New"}, {"text": "Existing"}]}
-                ]]}}
-            ]
-        })
-
-    if user_query == "new":
-        return jsonify({
-            "fulfillmentMessages": [
                 {"text": {"text": ["Are you interested in On-Premises or Cloud solutions?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "On-Premises"}, {"text": "Cloud"}]}
-                ]]}}
+                ]]} }
             ]
         })
 
-    if user_query in ["on-premises", "cloud"]:
-        return jsonify({
-            "fulfillmentMessages": [
-                {"text": {"text": [f"You selected {user_query.capitalize()}. Please choose an option:"]}},
-                {"payload": {"richContent": [[
-                    {"type": "chips", "options": [{"text": "DC"}, {"text": "DR"}, {"text": "Both"}]}
-                ]]}}
-            ]
-        })
+    if step == "ask_solution":
+        if user_query.lower() in ["on-premises", "cloud"]:
+            user_details[session]["solution_type"] = user_query.capitalize()
+            user_details[session]["step"] = "ask_service"
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": [f"You selected {user_query.capitalize()}. Please choose an option:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [{"text": "DC"}, {"text": "DR"}, {"text": "Both"}]}
+                    ]]} }
+                ]
+            })
 
-    if user_query in ["dc", "dr", "both"]:
-        return jsonify({"fulfillmentText": f"Thank you for your interest in {user_query.upper()} services. Our team will contact you shortly."})
+    if step == "ask_service":
+        if user_query.lower() in ["dc", "dr", "both"]:
+            solution = user_details[session]["solution_type"]
+            user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
+            return jsonify({"fulfillmentText": f"Thank you for choosing {solution} with {user_query.upper()} services. Our team will contact you shortly."})
 
     if user_query == "existing":
-        user_details[session] = {"step": "", "name": "", "contact": "", "email": ""}
+        user_details[session] = {"step": "", "name": "", "contact": "", "email": "", "solution_type": ""}
         return jsonify({"fulfillmentText": "Thank you! Our support team will assist you shortly as an existing customer."})
 
-    if faq:
+    # Fuzzy matching for general queries
+    if not step and faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
             return jsonify({"fulfillmentText": faq[best_match]})
