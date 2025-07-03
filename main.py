@@ -57,7 +57,9 @@ def webhook():
                         {"text": "Basic Questions"},
                         {"text": "Service-related Questions"},
                         {"text": "Data Centre"},
-                        {"text": "Co-location"}
+                        {"text": "Co-location"},
+                        {"text": "On-Premises"},
+                        {"text": "Cloud"}
                     ]}
                 ]]}}
             ]
@@ -112,6 +114,20 @@ def webhook():
                 {"text": {"text": ["Would you like to continue exploring Data Centre services?"]}},
                 {"payload": {"richContent": [[
                     {"type": "chips", "options": [{"text": "Yes"}, {"text": "No"}]}
+                ]]}}
+            ]
+        })
+
+    if user_query == "on-premises" or user_query == "cloud":
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": [f"You selected {user_query.capitalize()}. Please choose a service type:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "DC"},
+                        {"text": "DR"},
+                        {"text": "Both"}
+                    ]}
                 ]]}}
             ]
         })
