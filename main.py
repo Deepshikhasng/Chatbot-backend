@@ -46,9 +46,19 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Welcome Greeting
+    # Welcome Greeting with Buttons
     if intent == "Default Welcome Intent":
-        return jsonify({"fulfillmentText": "Hi! I am here to assist you. What would you like to ask about?"})
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["Hi! I am here to assist you. What would you like to ask about?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "Basic FAQ"},
+                        {"text": "Service Available"}
+                    ]}
+                ]]}}
+            ]
+        })
 
     if step == "main_menu":
         if user_query == "basic faq":
@@ -73,12 +83,23 @@ def webhook():
     if step == "service_options":
         if user_query == "data centre":
             user_details[session]["step"] = "datacentre_details"
-            return jsonify({"fulfillmentText": "Would you like On-Premises or Cloud?"})
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Would you like On-Premises or Cloud?"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [
+                            {"text": "On-Premises"},
+                            {"text": "Cloud"}
+                        ]}
+                    ]]}}
+                ]
+            })
 
         if user_query == "cloud services":
             user_details[session]["step"] = "cloud_options"
             return jsonify({
                 "fulfillmentMessages": [
+                    {"text": {"text": ["Please choose Cloud Service:"]}},
                     {"payload": {"richContent": [[
                         {"type": "chips", "options": [
                             {"text": "DC"},
@@ -111,12 +132,23 @@ def webhook():
     if step == "datacentre_details":
         if user_query == "on-premises":
             user_details[session]["step"] = "onprem_options"
-            return jsonify({"fulfillmentText": "Are you a New or Existing customer?"})
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Are you a New or Existing customer?"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [
+                            {"text": "New"},
+                            {"text": "Existing"}
+                        ]}
+                    ]]}}
+                ]
+            })
 
         if user_query == "cloud":
             user_details[session]["step"] = "cloud_options"
             return jsonify({
                 "fulfillmentMessages": [
+                    {"text": {"text": ["Please choose Cloud Service:"]}},
                     {"payload": {"richContent": [[
                         {"type": "chips", "options": [
                             {"text": "DC"},
@@ -156,7 +188,17 @@ def webhook():
     if step == "cloud_options":
         if user_query in ["dc", "dr", "both"]:
             user_details[session]["step"] = "cloud_service_type"
-            return jsonify({"fulfillmentText": "Choose service type: Hyperscaler or Traditional IaaS"})
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Choose service type:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [
+                            {"text": "Hyperscaler"},
+                            {"text": "Traditional IaaS"}
+                        ]}
+                    ]]}}
+                ]
+            })
 
     if step == "cloud_service_type":
         if user_query == "hyperscaler":
@@ -185,7 +227,7 @@ def webhook():
         user_details[session]["step"] = "main_menu"
         return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
 
-    # Fuzzy FAQ fallback
+    # Fallback FAQ
     if faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
