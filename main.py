@@ -108,7 +108,6 @@ def webhook():
                 ]
             })
 
-    # Collect User Details After Data Centre
     if step == "ask_name_dc":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact_dc"
@@ -125,7 +124,8 @@ def webhook():
         user_details[session]["email"] = user_query
         try:
             sheet.append_row([user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""])
-            user_details[session]["row_number"] = sheet.row_count
+            contact_cell = sheet.find(user_details[session]["contact"])
+            user_details[session]["row_number"] = contact_cell.row
         except Exception as e:
             print(f"Error storing details: {e}")
         user_details[session]["step"] = "datacentre_details"
@@ -141,7 +141,6 @@ def webhook():
             ]
         })
 
-    # Cloud User Info Collection
     if step == "ask_name_cloud":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact_cloud"
@@ -158,7 +157,8 @@ def webhook():
         user_details[session]["email"] = user_query
         try:
             sheet.append_row([user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""])
-            user_details[session]["row_number"] = sheet.row_count
+            contact_cell = sheet.find(user_details[session]["contact"])
+            user_details[session]["row_number"] = contact_cell.row
         except Exception as e:
             print(f"Error storing details: {e}")
         user_details[session]["step"] = "cloud_options"
