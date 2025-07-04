@@ -46,7 +46,6 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Welcome Greeting with Buttons
     if intent == "Default Welcome Intent":
         user_details[session]["step"] = "main_menu"
         return jsonify({
@@ -61,7 +60,6 @@ def webhook():
             ]
         })
 
-    # Main Menu Flow
     if step == "main_menu":
         if user_query == "basic faq":
             return jsonify({"fulfillmentText": "Sure! What would you like to ask about our services?"})
@@ -84,33 +82,12 @@ def webhook():
 
     if step == "service_options":
         if user_query == "data centre":
-            user_details[session]["step"] = "datacentre_details"
-            return jsonify({
-                "fulfillmentMessages": [
-                    {"text": {"text": ["Would you like On-Premises or Cloud?"]}},
-                    {"payload": {"richContent": [[
-                        {"type": "chips", "options": [
-                            {"text": "On-Premises"},
-                            {"text": "Cloud"}
-                        ]}
-                    ]]}}
-                ]
-            })
+            user_details[session]["step"] = "ask_name_dc"
+            return jsonify({"fulfillmentText": "Please enter your Name."})
 
         if user_query == "cloud services":
-            user_details[session]["step"] = "cloud_options"
-            return jsonify({
-                "fulfillmentMessages": [
-                    {"text": {"text": ["Please choose Cloud Service:"]}},
-                    {"payload": {"richContent": [[
-                        {"type": "chips", "options": [
-                            {"text": "DC"},
-                            {"text": "DR"},
-                            {"text": "Both"}
-                        ]}
-                    ]]}}
-                ]
-            })
+            user_details[session]["step"] = "ask_name_cloud"
+            return jsonify({"fulfillmentText": "Please enter your Name."})
 
         if user_query == "dedicated server":
             return jsonify({
@@ -130,6 +107,75 @@ def webhook():
                     ]]}}
                 ]
             })
+
+    # Collect User Details After Data Centre Selection
+    if step == "ask_name_dc":
+        user_details[session]["name"] = user_query.title()
+        user_details[session]["step"] = "ask_contact_dc"
+        return jsonify({"fulfillmentText": "Please enter your 10-digit Contact Number."})
+
+    if step == "ask_contact_dc":
+        if not user_query.isdigit() or len(user_query) != 10:
+            return jsonify({"fulfillmentText": "❗ Enter a valid 10-digit Contact Number."})
+        user_details[session]["contact"] = user_query
+        user_details[session]["step"] = "ask_email_dc"
+        return jsonify({"fulfillmentText": "Please enter your Email address."})
+
+    if step == "ask_email_dc":
+        user_details[session]["email"] = user_query
+        try:
+            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""]
+            sheet.append_row(row_data)
+            user_details[session]["row_number"] = sheet.row_count
+        except Exception as e:
+            print(f"Error storing details: {e}")
+        user_details[session]["step"] = "datacentre_details"
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["Would you like On-Premises or Cloud?"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "On-Premises"},
+                        {"text": "Cloud"}
+                    ]}
+                ]]}}
+            ]
+        })
+
+    # Collect User Details After Cloud Selection
+    if step == "ask_name_cloud":
+        user_details[session]["name"] = user_query.title()
+        user_details[session]["step"] = "ask_contact_cloud"
+        return jsonify({"fulfillmentText": "Please enter your 10-digit Contact Number."})
+
+    if step == "ask_contact_cloud":
+        if not user_query.isdigit() or len(user_query) != 10:
+            return jsonify({"fulfillmentText": "❗ Enter a valid 10-digit Contact Number."})
+        user_details[session]["contact"] = user_query
+        user_details[session]["step"] = "ask_email_cloud"
+        return jsonify({"fulfillmentText": "Please enter your Email address."})
+
+    if step == "ask_email_cloud":
+        user_details[session]["email"] = user_query
+        try:
+            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""]
+            sheet.append_row(row_data)
+            user_details[session]["row_number"] = sheet.row_count
+        except Exception as e:
+            print(f"Error storing details: {e}")
+        user_details[session]["step"] = "cloud_options"
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["Please choose Cloud Service:"]}},
+                {"payload": {"richContent": [[
+                    {"type": "chips", "options": [
+                        {"text": "DC"},
+                        {"text": "DR"},
+                        {"text": "Both"}
+                    ]}
+                ]]}}
+            ]
+        })
 
     if step == "datacentre_details":
         if user_query == "on-premises":
@@ -179,8 +225,9 @@ def webhook():
 
     if step == "existing_req":
         try:
-            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", user_query]
-            sheet.append_row(row_data)
+            row_number = user_details[session].get("row_number")
+            if row_number:
+                sheet.update_cell(row_number, 4, user_query)
         except Exception as e:
             print(f"Error storing requirement: {e}")
 
@@ -221,15 +268,15 @@ def webhook():
 
     if step == "ask_traditional_req":
         try:
-            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], user_query, ""]
-            sheet.append_row(row_data)
+            row_number = user_details[session].get("row_number")
+            if row_number:
+                sheet.update_cell(row_number, 5, user_query)
         except Exception as e:
-            print(f"Error storing Traditional IAAS requirement: {e}")
+            print(f"Error storing Traditional IaaS requirement: {e}")
 
         user_details[session]["step"] = "main_menu"
         return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
 
-    # Fallback FAQ
     if faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
