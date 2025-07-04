@@ -50,7 +50,7 @@ def webhook():
 
     if step == "main_menu":
         if user_query == "basic faq":
-            return jsonify({"fulfillmentText": "Sure! You can ask general questions like 'What is cloud hosting'."})
+            return jsonify({"fulfillmentText": "Sure! What would you like to ask about our services?"})
 
         if user_query == "service available":
             user_details[session]["step"] = "service_options"
