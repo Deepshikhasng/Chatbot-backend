@@ -93,7 +93,7 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "Dedicated Server", "link": "http://127.0.0.1:5500/cloud-services.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "Dedicated Server", "link": "https://www.vensyscotechnologies.com/cloudservices/cloud-services.html"}
                     ]]}}
                 ]
             })
@@ -102,8 +102,8 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "New", "link": "http://127.0.0.1:5500/colocation.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Existing", "link": "http://127.0.0.1:5500/colocation.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "New", "link": "https://www.vensyscotechnologies.com/cloudservices/colocation.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Existing", "link": "https://www.vensyscotechnologies.com/cloudservices/colocation.html"}
                     ]]}}
                 ]
             })
@@ -210,9 +210,9 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "DC", "link": "http://127.0.0.1:5500/datacenter.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "DR", "link": "http://127.0.0.1:5500/datacenter.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Both", "link": "http://127.0.0.1:5500/datacenter.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "DC", "link": "https://www.vensyscotechnologies.com/cloudservices/datacenter.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "DR", "link": "https://www.vensyscotechnologies.com/cloudservices/datacenter.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Both", "link": "https://www.vensyscotechnologies.com/cloudservices/datacenter.html"}
                     ]]}}
                 ]
             })
@@ -251,10 +251,10 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "AWS", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Azure", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Google Cloud", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Oracle", "link": "http://127.0.0.1:5500/newer_index_testng.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "AWS", "link": "https://www.vensyscotechnologies.com/cloudservices/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Azure", "link": "https://www.vensyscotechnologies.com/cloudservices/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Google Cloud", "link": "https://www.vensyscotechnologies.com/cloudservices/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Oracle", "link": "https://www.vensyscotechnologies.com/cloudservices/newer_index_testng.html"}
                     ]]}}
                 ]
             })
