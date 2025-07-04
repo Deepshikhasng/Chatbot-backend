@@ -93,7 +93,7 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "Dedicated Server", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/cloud-services.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "Dedicated Server", "link": "http://127.0.0.1:5500/cloud-services.html"}
                     ]]}}
                 ]
             })
@@ -102,13 +102,13 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "New", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/colocation.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Existing", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/colocation.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "New", "link": "http://127.0.0.1:5500/colocation.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Existing", "link": "http://127.0.0.1:5500/colocation.html"}
                     ]]}}
                 ]
             })
 
-    # Collect User Details After Data Centre Selection
+    # Collect User Details After Data Centre
     if step == "ask_name_dc":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact_dc"
@@ -124,8 +124,7 @@ def webhook():
     if step == "ask_email_dc":
         user_details[session]["email"] = user_query
         try:
-            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""]
-            sheet.append_row(row_data)
+            sheet.append_row([user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""])
             user_details[session]["row_number"] = sheet.row_count
         except Exception as e:
             print(f"Error storing details: {e}")
@@ -142,7 +141,7 @@ def webhook():
             ]
         })
 
-    # Collect User Details After Cloud Selection
+    # Cloud User Info Collection
     if step == "ask_name_cloud":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact_cloud"
@@ -158,8 +157,7 @@ def webhook():
     if step == "ask_email_cloud":
         user_details[session]["email"] = user_query
         try:
-            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""]
-            sheet.append_row(row_data)
+            sheet.append_row([user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""])
             user_details[session]["row_number"] = sheet.row_count
         except Exception as e:
             print(f"Error storing details: {e}")
@@ -212,9 +210,9 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "DC", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/datacenter.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "DR", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/datacenter.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Both", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/datacenter.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "DC", "link": "http://127.0.0.1:5500/datacenter.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "DR", "link": "http://127.0.0.1:5500/datacenter.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Both", "link": "http://127.0.0.1:5500/datacenter.html"}
                     ]]}}
                 ]
             })
@@ -225,12 +223,11 @@ def webhook():
 
     if step == "existing_req":
         try:
-            row_number = user_details[session].get("row_number")
-            if row_number:
-                sheet.update_cell(row_number, 4, user_query)
+            row = user_details[session].get("row_number")
+            if row:
+                sheet.update_cell(row, 4, user_query)
         except Exception as e:
             print(f"Error storing requirement: {e}")
-
         user_details[session]["step"] = "main_menu"
         return jsonify({"fulfillmentText": "Thank you! Our team will contact you."})
 
@@ -254,10 +251,10 @@ def webhook():
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "link"}, "text": "AWS", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Azure", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Google Cloud", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"},
-                        {"type": "button", "icon": {"type": "link"}, "text": "Oracle", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"}
+                        {"type": "button", "icon": {"type": "link"}, "text": "AWS", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Azure", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Google Cloud", "link": "http://127.0.0.1:5500/newer_index_testng.html"},
+                        {"type": "button", "icon": {"type": "link"}, "text": "Oracle", "link": "http://127.0.0.1:5500/newer_index_testng.html"}
                     ]]}}
                 ]
             })
@@ -268,9 +265,9 @@ def webhook():
 
     if step == "ask_traditional_req":
         try:
-            row_number = user_details[session].get("row_number")
-            if row_number:
-                sheet.update_cell(row_number, 5, user_query)
+            row = user_details[session].get("row_number")
+            if row:
+                sheet.update_cell(row, 5, user_query)
         except Exception as e:
             print(f"Error storing Traditional IaaS requirement: {e}")
 
