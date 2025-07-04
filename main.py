@@ -47,10 +47,15 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Handle greeting on Welcome Intent
+    # Welcome greeting, then ask for name
     if intent == "Default Welcome Intent":
         user_details[session] = {"step": "ask_name", "name": "", "contact": "", "email": "", "row_number": None}
-        return jsonify({"fulfillmentText": "Hi! Welcome to our services. Please Enter your Name?"})
+        return jsonify({
+            "fulfillmentMessages": [
+                {"text": {"text": ["Hi! Welcome to our services."]}},
+                {"text": {"text": ["May I know your Name?"]}}
+            ]
+        })
 
     # Step 1: Ask Name
     if step == "ask_name":
