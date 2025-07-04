@@ -48,6 +48,7 @@ def webhook():
 
     # Welcome Greeting with Buttons
     if intent == "Default Welcome Intent":
+        user_details[session]["step"] = "main_menu"
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! I am here to assist you. What would you like to ask about?"]}},
@@ -60,6 +61,7 @@ def webhook():
             ]
         })
 
+    # Main Menu Flow
     if step == "main_menu":
         if user_query == "basic faq":
             return jsonify({"fulfillmentText": "Sure! What would you like to ask about our services?"})
