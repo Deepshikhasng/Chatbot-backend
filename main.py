@@ -46,7 +46,7 @@ def webhook():
 
     # Welcome Greeting
     if intent == "Default Welcome Intent":
-        return jsonify({"fulfillmentText": "Hi! What would you like to ask about?"})
+        return jsonify({"fulfillmentText": "Hi! I am here to assist you. What would you like to ask about?"})
 
     if step == "main_menu":
         if user_query == "basic faq":
