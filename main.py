@@ -12,8 +12,10 @@ user_details = {}
 # Google Sheets Setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 google_creds_raw = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+
 if not google_creds_raw:
     raise Exception("Google Credentials not found in environment variables.")
+
 google_creds_dict = json.loads(google_creds_raw)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(google_creds_dict, scope)
 client = gspread.authorize(creds)
@@ -74,6 +76,7 @@ def webhook():
             return jsonify({"fulfillmentText": "Would you like On-Premises or Cloud?"})
 
         if user_query == "cloud services":
+            user_details[session]["step"] = "cloud_options"
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
@@ -111,6 +114,7 @@ def webhook():
             return jsonify({"fulfillmentText": "Are you a New or Existing customer?"})
 
         if user_query == "cloud":
+            user_details[session]["step"] = "cloud_options"
             return jsonify({
                 "fulfillmentMessages": [
                     {"payload": {"richContent": [[
@@ -181,7 +185,7 @@ def webhook():
         user_details[session]["step"] = "main_menu"
         return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
 
-    # Fallback to FAQs
+    # Fuzzy FAQ fallback
     if faq:
         best_match, score = process.extractOne(user_query, faq.keys())
         if score >= 70:
