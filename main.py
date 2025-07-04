@@ -181,9 +181,12 @@ def webhook():
         if user_query == "hyperscaler":
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["Explore Hyperscaler options here:"]}},
+                    {"text": {"text": ["Select Cloud Provider:"]}},
                     {"payload": {"richContent": [[
-                        {"type": "button", "text": "Hyperscaler Services", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"}
+                        {"type": "button", "text": "AWS", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html#aws"},
+                        {"type": "button", "text": "Azure", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html#azure"},
+                        {"type": "button", "text": "Google Cloud", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html#googlecloud"},
+                        {"type": "button", "text": "Oracle", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html#oracle"}
                     ]]}}
                 ]
             })
