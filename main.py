@@ -23,12 +23,12 @@ sheet = client.open("chatbot_userdata").sheet1
 
 # FAQ database
 faq = {
-    "can i upgrade or downgrade my plan": "Yes, our flexible plans allow easy upgrades.",
-    "what is cloud hosting": "Cloud hosting uses virtual servers on the internet, offering scalability.",
+    "can i upgrade or downgrade my plan": "Yes, flexible plans allow easy upgrades.",
+    "what is cloud hosting": "Cloud hosting uses virtual servers with scalability.",
     "do you offer technical support": "Yes, 24/7 technical support is available.",
     "what are your service hours": "We are available 24/7, including holidays.",
-    "how can i cancel my subscription": "Cancel anytime via your dashboard or by contacting support.",
-    "do you offer custom plans": "Yes, customized plans are available. Contact sales for details."
+    "how can i cancel my subscription": "Cancel anytime via your dashboard or support.",
+    "do you offer custom plans": "Yes, contact our sales team for customized plans."
 }
 
 @app.route('/')
@@ -47,7 +47,7 @@ def webhook():
 
     step = user_details[session]["step"]
 
-    # Welcome greeting, then ask for name
+    # Greeting and ask Name
     if intent == "Default Welcome Intent":
         user_details[session] = {"step": "ask_name", "name": "", "contact": "", "email": "", "row_number": None}
         return jsonify({
@@ -57,13 +57,13 @@ def webhook():
             ]
         })
 
-    # Step 1: Ask Name
+    # Ask Name
     if step == "ask_name":
         user_details[session]["name"] = user_query.title()
         user_details[session]["step"] = "ask_contact"
         return jsonify({"fulfillmentText": "Thank you! Please enter your 10-digit Contact Number."})
 
-    # Step 2: Ask Contact
+    # Ask Contact
     if step == "ask_contact":
         if not user_query.isdigit() or len(user_query) != 10:
             return jsonify({"fulfillmentText": "❗ Please enter a valid 10-digit Contact Number."})
@@ -71,11 +71,17 @@ def webhook():
         user_details[session]["step"] = "ask_email"
         return jsonify({"fulfillmentText": "Almost done! Please enter your Email address."})
 
-    # Step 3: Ask Email
+    # Ask Email
     if step == "ask_email":
         user_details[session]["email"] = user_query
         try:
-            row_data = [user_details[session]["name"], user_details[session]["contact"], user_details[session]["email"], "", ""]
+            row_data = [
+                user_details[session]["name"],
+                user_details[session]["contact"],
+                user_details[session]["email"],
+                "",  # Requirement of Existing User
+                ""   # Requirement of Traditional IAAS
+            ]
             sheet.append_row(row_data)
             user_details[session]["row_number"] = sheet.row_count
         except Exception as e:
@@ -115,7 +121,14 @@ def webhook():
     # Service Options
     if step == "service_options":
         if user_query == "data centre":
-            return jsonify({"fulfillmentText": "A Data Centre centralizes IT operations for managing your data."})
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Explore our Data Centre services below:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "button", "text": "Data Centre Details", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/datacenter.html"}
+                    ]]}}
+                ]
+            })
 
         if user_query == "cloud services":
             user_details[session]["step"] = "cloud_options"
@@ -129,10 +142,25 @@ def webhook():
             })
 
         if user_query == "dedicated server":
-            return jsonify({"fulfillmentText": "Dedicated Servers provide high-performance hosting for your applications."})
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["View our Dedicated Server offerings here:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "button", "text": "Dedicated Server Info", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/cloud-services.html"}
+                    ]]}}
+                ]
+            })
 
         if user_query == "co-location":
-            return jsonify({"fulfillmentText": "Co-location allows you to house your equipment in our secure data centres."})
+            user_details[session]["step"] = "colocation_options"
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Are you a New or Existing customer for Co-location?"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "chips", "options": [{"text": "New"}, {"text": "Existing"}]}
+                    ]]}}
+                ]
+            })
 
     # Cloud Options
     if step == "cloud_options":
@@ -153,12 +181,9 @@ def webhook():
         if user_query == "hyperscaler":
             return jsonify({
                 "fulfillmentMessages": [
-                    {"text": {"text": ["Select Cloud Provider:"]}},
+                    {"text": {"text": ["Explore Hyperscaler options here:"]}},
                     {"payload": {"richContent": [[
-                        {"type": "button", "icon": {"type": "cloud"}, "text": "AWS", "link": "https://example.com/aws"},
-                        {"type": "button", "icon": {"type": "cloud"}, "text": "Azure", "link": "https://example.com/azure"},
-                        {"type": "button", "icon": {"type": "cloud"}, "text": "Google Cloud", "link": "https://example.com/googlecloud"},
-                        {"type": "button", "icon": {"type": "cloud"}, "text": "Oracle", "link": "https://example.com/oracle"}
+                        {"type": "button", "text": "Hyperscaler Services", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/newer_index_testng.html"}
                     ]]}}
                 ]
             })
@@ -167,17 +192,39 @@ def webhook():
             user_details[session]["step"] = "ask_traditional_req"
             return jsonify({"fulfillmentText": "Kindly provide your requirement for Traditional IaaS."})
 
-    # Requirement for Traditional IaaS
+    # Requirement for Traditional IaaS (Column E)
     if step == "ask_traditional_req":
         try:
             row_number = user_details[session].get("row_number")
             if row_number:
-                sheet.update_cell(row_number, 4, user_query)
+                sheet.update_cell(row_number, 5, user_query)
         except Exception as e:
             print(f"Error storing Traditional IAAS requirement: {e}")
 
         user_details[session]["step"] = "main_menu"
         return jsonify({"fulfillmentText": "Thank you! Our team will contact you shortly."})
+
+    # Co-location Options
+    if step == "colocation_options":
+        if user_query == "new":
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["View Co-location details for new customers here:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "button", "text": "Co-location New Customer", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/colocation.html"}
+                    ]]}}
+                ]
+            })
+
+        if user_query == "existing":
+            return jsonify({
+                "fulfillmentMessages": [
+                    {"text": {"text": ["Existing Co-location customers, view details here:"]}},
+                    {"payload": {"richContent": [[
+                        {"type": "button", "text": "Co-location Existing Customer", "link": "https://legendary-spork-x5vwwqq59447fvvq5-5500.app.github.dev/colocation.html"}
+                    ]]}}
+                ]
+            })
 
     # Fuzzy FAQ fallback
     if faq:
