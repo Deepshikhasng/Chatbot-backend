@@ -47,7 +47,8 @@ def webhook():
     step = user_details[session]["step"]
 
     if intent == "Default Welcome Intent":
-        user_details[session]["step"] = "main_menu"
+        user_details[session] = {"step": "main_menu", "name": "", "contact": "", "email": "", "row_number": None}
+
         return jsonify({
             "fulfillmentMessages": [
                 {"text": {"text": ["Hi! I am here to assist you. What would you like to ask about?"]}},
